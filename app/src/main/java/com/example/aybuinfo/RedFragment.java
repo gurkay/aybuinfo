@@ -1,15 +1,31 @@
 package com.example.aybuinfo;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 
 
 /**
@@ -18,6 +34,15 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class RedFragment extends Fragment {
+
+    // JSoup Librariy Setting
+    TextView fragment_red_txt_title;
+    LinearLayout fragment_red_j_soup_pnl_add;
+    View redView;
+
+    private String webSiteUrl;
+    public String findContent;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -63,12 +88,91 @@ public class RedFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_red, container, false);
+        setFindContent("Aylık Yemek Menüsü");
+        setWebSiteUrl("https://aybu.edu.tr/sks/");
+        redView = inflater.inflate(R.layout.fragment_red, container, false);
+
+        fragment_red_txt_title = redView.findViewById(R.id.fragment_red_txt_title);
+        fragment_red_j_soup_pnl_add = redView.findViewById(R.id.fragment_red_j_soup_pnl_add);
+
+        getWebSite();
+
+
+
+        return redView;//inflater.inflate(R.layout.fragment_red, container, false);
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_red, menu);
+    }
+    public void setWebSiteUrl(String siteUrl) {
+        this.webSiteUrl = siteUrl;
+    }
+    public void setFindContent(String findContent) {
+        this.findContent = findContent;
+    }
+
+    public void getWebSite() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final StringBuilder builder = new StringBuilder();
+                try {
+                    Document doc = Jsoup.connect(webSiteUrl).get();
+
+                    String title = doc.title();
+
+                    builder.append(title).append("\n");
+
+                    Elements links = doc.select("a[href]");
+                    log("Here : ", "Yemek Menu");
+                    for(Element link : links) {
+                        if(findContent.equalsIgnoreCase(link.text())) {
+                            builder.append("\n").append(link.attr("href"))
+                                    .append("\n").append(link.text());
+                        }
+                    }
+
+                }catch (IOException e) {
+                    builder.append("\n").append("Error : ").append(e.getMessage()).append("\n");
+                }
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        String[] text = builder.toString().split("\n");
+                        log("fragment_red_txt_title.setText(text[0]) : text[0]", text[0]);
+                        fragment_red_txt_title.setText("Aylık Yemek Menüsü");
+                        fragment_red_j_soup_pnl_add.removeAllViews();
+                        String textLink = "";
+                        for (int i=2; i < text.length; i++) {
+                            if(i%2 == 0) {
+                                textLink = text[i].toString();
+                            } else {
+                                Button button = new Button(getContext());
+                                log("Text : ", text[i].toString());
+
+                                final String finalTextLimk = textLink;
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), finalTextLimk , Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                button.setText(text[i]);
+                                fragment_red_j_soup_pnl_add.addView(button);
+                            }
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private static void log(String msg, String vals) {
+        System.out.println(String.format("\n" + msg + " " + vals));
     }
 }
