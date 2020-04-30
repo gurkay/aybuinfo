@@ -1,10 +1,13 @@
 package com.example.aybuinfo;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +23,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 
 
@@ -147,11 +151,19 @@ public class BlueFragment extends Fragment {
                                 Button button = new Button(getContext());
                                 log("Text : ", text[i].toString());
 
-                                final String finalTextLimk = textLink;
+                                final String finalTextLink = textLink;
                                 button.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), finalTextLimk , Toast.LENGTH_LONG).show();
+                                        try {
+                                            Intent intent = new Intent();
+                                            intent.setAction(Intent.ACTION_VIEW);
+                                            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                                            intent.setData(Uri.parse("https://aybu.edu.tr/muhendislik/bilgisayar/" + finalTextLink));
+                                            startActivity(intent);
+                                        } catch (Exception e) {
+                                            log("ERROR : ", e.getMessage());
+                                        }
                                     }
                                 });
 

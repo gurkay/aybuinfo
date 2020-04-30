@@ -1,5 +1,7 @@
 package com.example.aybuinfo;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -153,11 +155,19 @@ public class GreenFragment extends Fragment {
                                 Button button = new Button(getContext());
                                 log("Text : ", text[i].toString());
 
-                                final String finalTextLimk = textLink;
+                                final String finalTextLink = textLink;
                                 button.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), finalTextLimk , Toast.LENGTH_LONG).show();
+                                        try {
+                                            Intent intent = new Intent();
+                                            intent.setAction(Intent.ACTION_VIEW);
+                                            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                                            intent.setData(Uri.parse("https://aybu.edu.tr/muhendislik/bilgisayar/" + finalTextLink));
+                                            startActivity(intent);
+                                        } catch (Exception e) {
+                                            log("ERROR : ", e.getMessage());
+                                        }
                                     }
                                 });
 

@@ -1,11 +1,14 @@
 package com.example.aybuinfo;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -25,6 +28,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 
 
@@ -155,11 +159,22 @@ public class RedFragment extends Fragment {
                                 Button button = new Button(getContext());
                                 log("Text : ", text[i].toString());
 
-                                final String finalTextLimk = textLink;
+                                final String finalTextLink = textLink;
                                 button.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Toast.makeText(getContext(), finalTextLimk , Toast.LENGTH_LONG).show();
+                                        String filename = "https://aybu.edu.tr/sks/" + finalTextLink;
+                                        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ filename);
+                                        Intent target = new Intent();
+                                        target.setAction(Intent.ACTION_VIEW);
+                                        target.setDataAndType(Uri.fromFile(file), "application/pdf");
+                                        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                        Intent intent = Intent.createChooser(target, "Open File");
+                                        try {
+                                            startActivity(intent);
+                                        } catch (Exception e) {
+                                            log("ERROR : ", e.getMessage());
+                                        }
                                     }
                                 });
                                 button.setText(text[i]);
