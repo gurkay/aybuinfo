@@ -5,5 +5,5 @@
         android:id="@+id/action_call"
         android:title="Red Fragment Call"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/bear"/>
+        android:icon="@drawable/foods"/>
 </menu>

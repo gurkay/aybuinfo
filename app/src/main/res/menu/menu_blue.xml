@@ -5,5 +5,5 @@
         android:id="@+id/action_call"
         android:title="Blue Fragment Call"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/crocodile"/>
+        android:icon="@drawable/news"/>
 </menu>

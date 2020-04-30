@@ -10,14 +10,9 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/DimGray">
+        android:background="@color/IndianRed">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/tab_view_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/app_tab_view_example"
-            app:layout_scrollFlags="scroll|enterAlways"/>
+
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/tab_view_toolbar_tab"
@@ -32,7 +27,7 @@
                 android:layout_height="wrap_content"
                 app:tabTextColor="@color/WhiteSmoke"
                 app:tabSelectedTextColor="@color/Black"
-                android:background="@color/DimGray">
+                android:background="@color/IndianRed">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="wrap_content"
