@@ -2,6 +2,7 @@ package com.example.aybuinfo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -141,17 +142,7 @@ public class RedFragment extends Fragment {
                         }
                     }
 
-//                    Element table = doc.select("table").get(1);
-//                    Elements rows = table.select("tr");
-//
-//                    for(int i = 1; i < rows.size(); i++) {
-//                        Element row = rows.get(i);
-//                        Elements cols = row.select("td");
-//                        builderFoodToday.append("\n").append(cols.text());
-//                        log("==============================> cols.text() : ", cols.text());
-//                    }
-
-                    Document doc1 = Jsoup.connect(webSiteUrl).get();
+                    Document doc1 = Jsoup.connect("http://web.archive.org/web/20190406185041/https://aybu.edu.tr/sks/").get();
                     Elements tables = doc1.select("table tr td:has(table)");
 
                     for (Element table2 : tables) {
@@ -160,10 +151,9 @@ public class RedFragment extends Fragment {
                         for (int a = 0; a < trs.size(); a++) {
                             Elements tds = trs.get(a).select("td");
                             trtd[a] = new String[tds.size()];
-
                             for (int b = 0; b < tds.size(); b++) {
                                 trtd[a][b] = tds.get(b).text();
-                                System.out.print("==> " + trtd[a][b] +"    ");
+                                builderFoodToday.append("\n").append(trtd[a][b]);
                             }
                             System.out.println( );
                         }
@@ -177,19 +167,25 @@ public class RedFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        fragment_red_j_soup_pnl_add.removeAllViews();
 
                         String[] textFoodToday = builderFoodToday.toString().split("\n");
-
-                        for (int i=0; i < textFoodToday.length; i++) {
-                            log("==============================> textFoodToday[0]", textFoodToday[0]);
+                        fragment_red_txt_title.setText("Günlük Yemek Menüsü" + "\nTarih : " + textFoodToday[11]);
+                        for (int i=12; i < textFoodToday.length; i++) {
+                            TextView textView = new TextView(getContext());
+                            textView.setTextSize(20);
+                            textView.setTextColor(Color.WHITE);
+                            textView.setText(i-11 + " ) " + textFoodToday[i]);
+                            fragment_red_j_soup_pnl_add.addView(textView);
+                            log("==============================> textFoodToday[" + i + "]", textFoodToday[i]);
                         }
 
                         String[] text = builder.toString().split("\n");
 
 
                         log("fragment_red_txt_title.setText(text[0]) : text[0]", text[0]);
-                        fragment_red_txt_title.setText("Aylık Yemek Menüsü");
-                        fragment_red_j_soup_pnl_add.removeAllViews();
+
+
                         String textLink = "";
                         for (int i=2; i < text.length; i++) {
                             if(i%2 == 0) {
