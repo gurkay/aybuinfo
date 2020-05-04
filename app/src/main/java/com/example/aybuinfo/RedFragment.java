@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.os.Environment;
+import android.provider.SyncStateContract;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -123,6 +124,7 @@ public class RedFragment extends Fragment {
             @Override
             public void run() {
                 final StringBuilder builder = new StringBuilder();
+                final StringBuilder builderFoodToday = new StringBuilder();
                 try {
                     Document doc = Jsoup.connect(webSiteUrl).get();
 
@@ -139,6 +141,35 @@ public class RedFragment extends Fragment {
                         }
                     }
 
+//                    Element table = doc.select("table").get(1);
+//                    Elements rows = table.select("tr");
+//
+//                    for(int i = 1; i < rows.size(); i++) {
+//                        Element row = rows.get(i);
+//                        Elements cols = row.select("td");
+//                        builderFoodToday.append("\n").append(cols.text());
+//                        log("==============================> cols.text() : ", cols.text());
+//                    }
+
+                    Document doc1 = Jsoup.connect(webSiteUrl).get();
+                    Elements tables = doc1.select("table tr td:has(table)");
+
+                    for (Element table2 : tables) {
+                        Elements trs = table2.select("tr");
+                        String[][] trtd = new String[trs.size()][];
+                        for (int a = 0; a < trs.size(); a++) {
+                            Elements tds = trs.get(a).select("td");
+                            trtd[a] = new String[tds.size()];
+
+                            for (int b = 0; b < tds.size(); b++) {
+                                trtd[a][b] = tds.get(b).text();
+                                System.out.print("==> " + trtd[a][b] +"    ");
+                            }
+                            System.out.println( );
+                        }
+                        // trtd now contains the desired array for this table
+                    }
+
                 }catch (IOException e) {
                     builder.append("\n").append("Error : ").append(e.getMessage()).append("\n");
                 }
@@ -147,13 +178,22 @@ public class RedFragment extends Fragment {
                     @Override
                     public void run() {
 
+                        String[] textFoodToday = builderFoodToday.toString().split("\n");
+
+                        for (int i=0; i < textFoodToday.length; i++) {
+                            log("==============================> textFoodToday[0]", textFoodToday[0]);
+                        }
+
                         String[] text = builder.toString().split("\n");
+
+
                         log("fragment_red_txt_title.setText(text[0]) : text[0]", text[0]);
                         fragment_red_txt_title.setText("Aylık Yemek Menüsü");
                         fragment_red_j_soup_pnl_add.removeAllViews();
                         String textLink = "";
                         for (int i=2; i < text.length; i++) {
                             if(i%2 == 0) {
+
                                 textLink = text[i].toString();
                             } else {
                                 Button button = new Button(getContext());
@@ -163,12 +203,14 @@ public class RedFragment extends Fragment {
                                 button.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        String filename = "https://aybu.edu.tr/sks/" + finalTextLink;
+                                        log("Link : ", finalTextLink);
+                                        String filename = "https://aybu.edu.tr" + finalTextLink;
+                                        log("filename : ", filename);
                                         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ filename);
                                         Intent target = new Intent();
                                         target.setAction(Intent.ACTION_VIEW);
-                                        target.setDataAndType(Uri.fromFile(file), "application/pdf");
-                                        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                        target.setDataAndType(Uri.parse(filename), "application/pdf");
+                                        target.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         Intent intent = Intent.createChooser(target, "Open File");
                                         try {
                                             startActivity(intent);
@@ -188,6 +230,6 @@ public class RedFragment extends Fragment {
     }
 
     private static void log(String msg, String vals) {
-        System.out.println(String.format("\n" + msg + " " + vals));
+        System.out.println("\n" + msg + " " + vals);
     }
 }
